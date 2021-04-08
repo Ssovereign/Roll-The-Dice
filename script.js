@@ -86,25 +86,31 @@ const player2Name = document.getElementById("name--1");
 const updateDice = function (number) {
   switch (number) {
     case 1:
+      diceImage.classList.remove("hidden");
       diceImage.src = "dice-1.png";
       break;
     case 2:
+      diceImage.classList.remove("hidden");
       diceImage.src = "dice-2.png";
       break;
     case 3:
+      diceImage.classList.remove("hidden");
       diceImage.src = "dice-3.png";
       break;
     case 4:
+      diceImage.classList.remove("hidden");
       diceImage.src = "dice-4.png";
       break;
     case 5:
+      diceImage.classList.remove("hidden");
       diceImage.src = "dice-5.png";
       break;
     case 6:
+      diceImage.classList.remove("hidden");
       diceImage.src = "dice-6.png";
       break;
     default:
-      diceImage.src = "";
+      diceImage.classList.add("hidden");
       break;
   }
 };
