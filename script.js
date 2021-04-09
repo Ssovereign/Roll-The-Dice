@@ -1,5 +1,9 @@
 "use strict";
 
+//////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////// CLASS ////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
 class Player {
   constructor(score, currentScore, turn) {
     this.score = score;
@@ -27,31 +31,13 @@ class Player {
 
   updateCurrentScorePlayer(number) {
     this.currentScore += number;
-    if (player1.turn)
-      displayedCurrentScorePlayer1.innerText = this.currentScore;
-    if (player2.turn)
-      displayedCurrentScorePlayer2.innerText = this.currentScore;
+    if (player1.turn) return displayedCurrentScorePlayer1.innerText = this.currentScore;
+    if (player2.turn) return displayedCurrentScorePlayer2.innerText = this.currentScore;
   }
 
   updateScorePlayer(number) {
-    if (this.score >= 100) {
-      if (player1.score >= 100) {
-        player1Name.innerText = "WINNER";
-        displayedScorePlayer1.innerText = number;
-      }
-      if (player2.score >= 100) {
-        player2Name.innerText = "WINNER";
-        displayedScorePlayer2.innerText = number;
-      }
-    } else {
-      if (player1.turn) {
-        displayedScorePlayer1.innerText = number;
-      }
-      if (player2.turn) {
-        displayedScorePlayer2.innerText = number;
-      }
-      changeTurn();
-    }
+    if (this.score >= 100) return checkWinner(number);
+    return checkWhichPlayerToUpdateScore(number), changeTurn();
   }
 
   newGame() {
@@ -61,10 +47,16 @@ class Player {
     this.updateCurrentScorePlayer(this.currentScore);
     this.updateScorePlayer(this.score);
     this.rollDice;
-    updateDice();
-    player2.turn = player1.turn ? false : true;
+    diceImage.classList.add("hidden");
+    player1Square.classList.remove("player--winner");
+    player2Square.classList.remove("player--winner");
+    player2.turn = !player1.turn;
   }
 }
+
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////// DECLARATIONS ///////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
 
 const player1 = new Player(0, 0, true);
 const player2 = new Player(0, 0, false);
@@ -83,55 +75,67 @@ const player2Square = document.querySelector(".player--1");
 const player1Name = document.getElementById("name--0");
 const player2Name = document.getElementById("name--1");
 
-const updateDice = function (number) {
-  switch (number) {
-    case 1:
-      diceImage.classList.remove("hidden");
-      diceImage.src = "dice-1.png";
-      break;
-    case 2:
-      diceImage.classList.remove("hidden");
-      diceImage.src = "dice-2.png";
-      break;
-    case 3:
-      diceImage.classList.remove("hidden");
-      diceImage.src = "dice-3.png";
-      break;
-    case 4:
-      diceImage.classList.remove("hidden");
-      diceImage.src = "dice-4.png";
-      break;
-    case 5:
-      diceImage.classList.remove("hidden");
-      diceImage.src = "dice-5.png";
-      break;
-    case 6:
-      diceImage.classList.remove("hidden");
-      diceImage.src = "dice-6.png";
-      break;
-    default:
-      diceImage.classList.add("hidden");
-      break;
+//////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////// OUTSIDE FUNCTIONS ////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+const checkWinner = function() {
+  if (player1.score >= 100) {
+    player1Square.classList.add("player--winner");
+    displayedScorePlayer1.innerText = number;
   }
+  if (player2.score >= 100) {
+    player2Square.classList.add("player--winner");
+    displayedScorePlayer2.innerText = number;
+  }
+}
+
+const checkWhichPlayerToUpdateScore = function(number) {
+  if (player1.turn) {
+    displayedScorePlayer1.innerText = number;
+  }
+  if (player2.turn) {
+    displayedScorePlayer2.innerText = number;
+  }
+}
+
+const updateDice = function (number) {
+  diceImage.classList.remove("hidden");
+  diceImage.src = `dice-${number}.png`;
+};
+
+const changingBackgroundForPlayer1 = function () {
+  player1Square.classList.remove("player--active");
+  player2Square.classList.add("player--active");
+};
+
+const changingBackgroundForPlayer2 = function () {
+  player2Square.classList.remove("player--active");
+  player1Square.classList.add("player--active");
+};
+
+const resetingPlayer1Turn = function () {
+  player1.turn = false;
+  player2.turn = !player1.turn;
+  player1.currentScore = 0;
+  player1.updateCurrentScorePlayer(player1.currentScore);
+};
+
+const resetingPlayer2Turn = function () {
+  player1.turn = true;
+  player2.turn = !player1.turn;
+  player2.currentScore = 0;
+  player2.updateCurrentScorePlayer(player2.currentScore);
 };
 
 const changeTurn = function () {
-  if (player1.turn) {
-    player1.turn = false;
-    player2.turn = !player1.turn;
-    player1.currentScore = 0;
-    player1.updateCurrentScorePlayer(player1.currentScore);
-    player1Square.classList.remove("player--active");
-    player2Square.classList.add("player--active");
-  } else {
-    player1.turn = true;
-    player2.turn = !player1.turn;
-    player2.currentScore = 0;
-    player2.updateCurrentScorePlayer(player2.currentScore);
-    player2Square.classList.remove("player--active");
-    player1Square.classList.add("player--active");
-  }
+  if (player1.turn) return resetingPlayer1Turn(), changingBackgroundForPlayer1();
+  return resetingPlayer2Turn(), changingBackgroundForPlayer2();
 };
+
+//////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////// EVENTS LISTENERS /////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
 
 newGameButton.addEventListener("click", (e) => {
   player1.newGame();
@@ -150,9 +154,6 @@ rollDiceButton.addEventListener("click", (e) => {
 });
 
 holdButton.addEventListener("click", (e) => {
-  if (player1.turn) {
-    player1.hold();
-  } else {
-    player2.hold();
-  }
+  if (player1.turn) return player1.hold();
+  return player2.hold();
 });
